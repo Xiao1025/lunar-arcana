@@ -59,3 +59,6 @@ main .panel{border-color:#dab37982;box-shadow:0 0 0 1px #b8805824 inset,0 16px 5
 @media(prefers-reduced-motion:reduce){.fan-card.tracking .fan-face,.fan-card.active.tracking .fan-face{transform:scale(1.1)}}
 
 #deck .card.active.fan-card:not(.revealed){outline:none}
+
+.header-tools,.journal-heading{display:flex;align-items:center;gap:8px}.journal-heading{justify-content:space-between}.journal-heading h2{margin:0;color:var(--gold)}#journal{width:min(92vw,640px);max-height:85vh;overflow:auto;color:#f9edd9;background:linear-gradient(150deg,#2c1d38,#170f22);border:1px solid #cda96b99;border-radius:14px;padding:clamp(16px,4vw,30px)}#journal::backdrop{background:#0d0714b8}#journal-list details{border-bottom:1px solid #d9b3754a;padding:12px 0;overflow-wrap:anywhere}#journal-list summary{cursor:pointer;color:#f8ddab;line-height:1.55}#journal-list p,#journal-list li{line-height:1.6}#save-note,#journal-status{color:var(--muted);font-size:13px}.arrival-mode #camera{display:none}
+

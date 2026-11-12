@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>月相 · 塔罗</title><meta name="description" content="在星夜牌桌上，用手势抽取完整的 78 张塔罗牌，阅读与你的问题有关的牌义。"><link rel="stylesheet" href="style.css"></head>
-<body class="arrival-mode"><header><a href="./">☾ <b>月 相</b> <small> / LUNAR ARCANA</small></a><button id="camera" type="button">◎ 开启手势</button></header>
+<body class="arrival-mode"><header><a href="./">☾ <b>月 相</b> <small> / LUNAR ARCANA</small></a><div class="header-tools"><button id="history" type="button">历史记录</button><button id="camera" type="button">◎ 开启手势</button></div></header>
 <section id="arrival" class="arrival" aria-labelledby="arrival-title">
  <div class="arrival-content"><p class="arrival-kicker">✦ &nbsp; LUNAR ARCANA &nbsp; ✦</p>
  <h1 id="arrival-title">月相塔罗</h1>
@@ -18,16 +18,21 @@
  <div class="examples"><button type="button" data-question="面对这次转岗，我最需要考虑什么？">工作</button><button type="button" data-question="这段关系中，我需要留意什么？">关系</button><button type="button" data-question="我该如何调整最近的学习节奏？">学习</button></div>
  <label for="layout">选择牌阵</label><select id="layout"><option value="advice">三张 · 现状 / 阻碍 / 建议</option><option value="time">三张 · 过去 / 现在 / 未来</option><option value="one">单张 · 此刻的启示</option></select>
  <label class="check"><input id="reverse" type="checkbox" checked> 启用逆位</label>
- <button class="primary" type="submit">✧ 洗牌并开始</button><p class="privacy">问题只在当前页面处理，不会上传或保存。</p>
-</form>
+ <button class="primary" type="submit">✧ 洗牌并开始</button><p class="privacy">问题不会上传；勾选下方选项后，解读会保存在此浏览器。</p>
+<label class="check"><input id="keep-reading" type="checkbox" checked> 保存本次解读到历史记录</label></form>
 <section id="table" hidden aria-label="塔罗牌桌">
  <div class="status" id="progress" tabindex="-1" aria-live="polite"></div><div id="deck" aria-label="可抽取的塔罗牌"></div>
  <div id="navigation" class="navigation"><button id="prev" aria-label="上一张">←</button><div><label for="browse" id="counter"></label><input type="range" id="browse" min="1" max="78" value="1" aria-label="浏览整副牌"></div><button id="next" aria-label="下一张">→</button></div>
  <div class="controls" id="actions"><button id="action" class="primary">抽取这张牌</button></div>
  <section id="spread" aria-label="已翻开的牌"></section>
- <section id="result" class="panel reading" hidden><div class="tag">03 / 解读</div><h2 id="result-title" tabindex="-1">你的牌阵解读</h2><p id="asked"></p><p id="reading"></p><strong>可以试试</strong><p id="step"></p></section>
+ <section id="result" class="panel reading" hidden><div class="tag">03 / 解读</div><h2 id="result-title" tabindex="-1">你的牌阵解读</h2><p id="asked"></p><p id="reading"></p><strong>可以试试</strong><p id="step"></p><p id="save-note" role="status"></p></section>
  <div class="controls end"><button id="again">返回提问</button><button id="reset">↻ 重新洗牌</button></div>
 </section></main>
+<dialog id="journal" aria-labelledby="journal-title">
+ <div class="journal-heading"><h2 id="journal-title">历史记录</h2><form method="dialog"><button id="journal-close" aria-label="关闭历史记录">关闭</button></form></div>
+ <p class="privacy">仅此浏览器可见，最多保留最近 50 条。清理浏览器数据会删除记录。</p>
+ <p id="journal-status" role="status"></p><div id="journal-list"></div>
+</dialog>
 <aside id="monitor" hidden><video autoplay muted playsinline></video><span id="signal" role="status">等待手势</span><div id="gesture-guide">左右移手选牌 · 拇指和食指捏合确认</div></aside>
 <footer>✧ &nbsp; 以塔罗为镜，留一点时间给自己。<a class="credits" href="https://github.com/mixvlad/TarotCards/blob/main/SOURCES.md">牌面：Pamela Colman Smith · 1909 韦特塔罗</a></footer>
 <script src="cards.js"></script><script type="module" src="app.js"></script>

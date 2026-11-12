@@ -19,7 +19,7 @@ let stream, model, starting=false, loop=0, last=-1, pinched=true, smooth=null, e
 const clamp=(n,min,max)=>Math.max(min,Math.min(n,max));
 const meaning=c=>c.reversed?c.rev:c.up;
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
-function shuffle(){ lockedUntil=pinchAt=releaseAt=0;
+function shuffle(){ document.querySelector("#save-note").textContent=""; lockedUntil=pinchAt=releaseAt=0;
  pool=cards.map(c=>({...c,reversed:reversals&&Math.random()<.5}));
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
  drawn=[]; selected=0; pending=null; complete=false; active=true; pinched=true; smooth=null; gestureBase=null; edge=0;
@@ -150,7 +150,7 @@ function advance(){
      flyCard(from,target.getBoundingClientRect(),card);
    }
  }
- if(complete)$('#result-title').focus({preventScroll:true});else action.focus({preventScroll:true});
+ if(complete){storeReading();$('#result-title').focus({preventScroll:true});}else action.focus({preventScroll:true});
 }
 
 $('#prev').onclick=()=>select(selected-1);$('#next').onclick=()=>select(selected+1);browse.oninput=()=>select(Number(browse.value)-1);action.onclick=advance;
@@ -232,3 +232,44 @@ function trackCard(b){
  });
  b.addEventListener('pointerleave',clear);b.addEventListener('pointercancel',clear);
 }
+
+const journalKey='lunar-arcana.readings.v1';
+const journal=$('#journal'), journalList=$('#journal-list');
+function readJournal(){
+ try{const data=JSON.parse(localStorage.getItem(journalKey)||'[]');return Array.isArray(data)?data:[]}catch{return []}
+}
+function writeJournal(items){
+ try{localStorage.setItem(journalKey,JSON.stringify(items));return true}catch{return false}
+}
+function storeReading(){
+ if(!$('#keep-reading').checked)return;
+ const now=new Date();
+ const item={id:crypto.randomUUID(),date:now.toISOString(),question,layout:$('#layout').selectedOptions[0].textContent,
+  cards:drawn.map((c,i)=>({name:c.name,side:c.reversed?'逆位':'正位',position:positions[i][0],meaning:meaning(c)})),
+  reading:$('#reading').textContent,step:$('#step').textContent};
+ $('#save-note').textContent=writeJournal([item,...readJournal()].slice(0,50))?'已保存到此浏览器的历史记录。':'浏览器未能保存这次解读。';
+}
+function journalText(tag,value,parent){
+ const el=document.createElement(tag);el.textContent=value;parent.append(el);return el
+}
+function paintJournal(){
+ const items=readJournal();journalList.replaceChildren();
+ if(!items.length){journalText('p','暂无记录。完成一次解读后，就可以回来查看。',journalList);return}
+ const dates=new Intl.DateTimeFormat('zh-CN',{dateStyle:'medium',timeStyle:'short'});
+ for(const item of items){
+   const entry=document.createElement('details');
+   const date=new Date(item.date);
+   journalText('summary',(item.question||'无主题解读')+' · '+(Number.isNaN(date.valueOf())?'':dates.format(date)),entry);
+   journalText('p',item.layout,entry);
+   const cardsList=document.createElement('ul');entry.append(cardsList);
+   for(const c of item.cards)journalText('li',c.position+'：'+c.name+'（'+c.side+'） · '+c.meaning,cardsList);
+   journalText('p',item.reading,entry);journalText('p','可以试试：'+item.step,entry);
+   const remove=journalText('button','删除这条记录',entry);remove.type='button';
+   remove.onclick=()=>{
+     if(!writeJournal(readJournal().filter(x=>x.id!==item.id))){$('#journal-status').textContent='删除失败，请检查浏览器存储设置。';return}
+     paintJournal();$('#journal-close').focus();$('#journal-status').textContent='已删除这条记录。';
+   };
+   journalList.append(entry);
+ }
+}
+$('#history').onclick=()=>{$('#journal-status').textContent='';paintJournal();journal.showModal()};

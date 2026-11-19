@@ -88,7 +88,7 @@ deck.addEventListener('touchend',e=>{
 window.addEventListener('resize',()=>{if(active&&!pending&&!complete)paintDeck()});
 
 function makeButton(label,fn){const b=document.createElement('button');b.type='button';b.className='card';b.setAttribute('aria-label',label);b.onclick=fn;return b}
-function render(){
+function render(){ table.classList.toggle('finished',complete&&!revealNeedsContinue);
  const n=drawn.length;
  $('#progress').textContent=complete?'牌阵已完成':(n+1)+' / '+positions.length+' · '+positions[n][0]+(pending?' · 等待翻牌':'');
  deck.replaceChildren(); $('#navigation').hidden=!!pending||complete; $('#actions').hidden=complete;
@@ -117,7 +117,7 @@ function render(){
    $('#reading').textContent=summary+' '+relation+' '+(theme?theme[2]:question?'把你问题中最不确定的一点，与这些线索对照，看看哪一点最贴近实际。':'留意哪个线索最贴近你此刻的处境。');
    $('#step').textContent=drawn.at(-1).step;
  }
- witchGuide();
+ highlightSpread(); witchGuide();
 }
 function flyCard(from,to,card){
  if(motion.matches||!from||!to||!to.width)return;
@@ -307,7 +307,7 @@ function confirmQuestion(){
  $('#layout').focus();
 }
 function resetQuestion(){
- ritualPhase='question';revealNeedsContinue=false;active=false;
+ ritualPhase='question';revealNeedsContinue=false;active=false;table.classList.remove('finished');
  $('#question-step').hidden=false;$('#layout-step').hidden=true;
  $('#continue-reading').hidden=true;form.hidden=false;table.hidden=true;
  witchSay('坐吧，旅人。今晚，你想问什么？');$('#question').focus();
@@ -316,8 +316,13 @@ $('#edit-question').onclick=resetQuestion;
 $('#continue-reading').onclick=()=>{
  revealNeedsContinue=false;$('#continue-reading').hidden=true;
  if(complete){
-   ritualPhase='finished';result.hidden=false;
-   witchSay('这些牌的线索已经连在一起了。'+$('#reading').textContent+' 愿你带着自己的判断离开这张桌子。今晚的仪式，就到这里。');
-   storeReading();$('#result-title').focus({preventScroll:true});
+   ritualPhase='finished';result.hidden=false;table.classList.add('finished');
+   witchSay('这副牌的启示是「'+meaning(drawn.at(-1))+'」。完整解读已经为你整理好，愿你带着自己的判断离开这张桌子。');
+   storeReading();$('#show-reading').focus({preventScroll:true});
  }else{render();action.focus()}
 };
+
+function highlightSpread(){
+ [...$('#spread').children].forEach((slot,i)=>slot.classList.toggle('current',i===drawn.length-1));
+}
+$('#show-reading').onclick=()=>{result.hidden=false;$('#reading-modal').showModal()};

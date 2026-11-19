@@ -19,7 +19,7 @@ let stream, model, starting=false, loop=0, last=-1, pinched=true, smooth=null, e
 const clamp=(n,min,max)=>Math.max(min,Math.min(n,max));
 const meaning=c=>c.reversed?c.rev:c.up;
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
-function shuffle(){ document.querySelector("#save-note").textContent=""; lockedUntil=pinchAt=releaseAt=0;
+function shuffle(){ ritualPhase="drawing";revealNeedsContinue=false; document.querySelector("#save-note").textContent=""; lockedUntil=pinchAt=releaseAt=0;
  pool=cards.map(c=>({...c,reversed:reversals&&Math.random()<.5}));
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
  drawn=[]; selected=0; pending=null; complete=false; active=true; pinched=true; smooth=null; gestureBase=null; edge=0;
@@ -27,11 +27,11 @@ function shuffle(){ document.querySelector("#save-note").textContent=""; lockedU
  if(!motion.matches) deck.animate([{opacity:.25,transform:'scale(.87)'},{opacity:1,transform:'scale(1)'}],420);
 }
 form.addEventListener('submit',e=>{
- e.preventDefault(); question=$('#question').value.trim(); positions=spreads[$('#layout').value]; reversals=$('#reverse').checked;
+ e.preventDefault(); if(ritualPhase==='question'){confirmQuestion();return} ritualPhase='drawing'; question=$('#question').value.trim(); positions=spreads[$('#layout').value]; reversals=$('#reverse').checked;
  theme=themes.find(([pattern])=>pattern.test(question)); shuffle();
 });
 document.querySelectorAll('[data-question]').forEach(b=>b.onclick=()=>{$('#question').value=b.dataset.question;$('#question').focus()});
-$('#again').onclick=()=>{active=false; form.hidden=false; table.hidden=true; witchSay('坐吧，旅人。我们可以从一个新的问题开始。'); $('#question').focus()};
+$('#again').onclick=resetQuestion;
 $('#reset').onclick=shuffle;
 function face(c){
  const names=['major','Wands','Cups','Swords','Pents'];
@@ -40,7 +40,7 @@ function face(c){
 }
 
 function select(index){
- if(!active||pending||complete||performance.now()<lockedUntil)return;
+ if(!active||pending||complete||revealNeedsContinue||performance.now()<lockedUntil)return;
  const next=((index%pool.length)+pool.length)%pool.length; if(next===selected)return;
  selected=next; paintDeck();
 }
@@ -105,7 +105,7 @@ function render(){
    const c=drawn[i];
    return '<article class="slot"><span>'+label+' · '+desc+'</span>'+(c?face(c)+'<p><strong>'+meaning(c)+'</strong>。'+context+'</p>':'<i>待揭晓</i>')+'</article>';
  }).join('');
- result.hidden=!complete;
+ result.hidden=!complete||revealNeedsContinue;
  if(complete){
    const [first,middle,final]=drawn;
    const focus=['价值与转变','行动与动力','感受与关系','信息与判断','资源与节奏'];
@@ -134,7 +134,7 @@ function flyCard(from,to,card){
  flight.finished.catch(()=>{}).finally(()=>{clearTimeout(timer);ghost.remove()});
 }
 function advance(){
- if(!active||complete||performance.now()<lockedUntil)return;
+ if(!active||complete||revealNeedsContinue||performance.now()<lockedUntil)return;
  const from=deck.querySelector('.card.active')?.getBoundingClientRect();
  if(!pending){
    pending=pool.splice(selected,1)[0];render();
@@ -142,7 +142,7 @@ function advance(){
    flyCard(from,deck.querySelector('.card.active')?.getBoundingClientRect(),null);
    action.focus();return;
  }
- const card=pending;drawn.push(card);pending=null;selected=Math.min(selected,pool.length-1);complete=drawn.length===positions.length;gestureBase=null;edge=0;render();
+ revealNeedsContinue=true;const card=pending;drawn.push(card);pending=null;selected=Math.min(selected,pool.length-1);complete=drawn.length===positions.length;gestureBase=null;edge=0;render();
  const target=$('#spread').children[drawn.length-1].querySelector('.art');
  if(!motion.matches){
    lockedUntil=performance.now()+650;
@@ -151,7 +151,7 @@ function advance(){
      flyCard(from,target.getBoundingClientRect(),card);
    }
  }
- if(complete){storeReading();$('#result-title').focus({preventScroll:true});}else action.focus({preventScroll:true});
+ $('#continue-reading').focus({preventScroll:true});
 }
 
 $('#prev').onclick=()=>select(selected-1);$('#next').onclick=()=>select(selected+1);browse.oninput=()=>select(Number(browse.value)-1);action.onclick=advance;
@@ -160,7 +160,7 @@ document.addEventListener('keydown',e=>{
  e.preventDefault(); select(selected+(e.key==='ArrowLeft'?-1:1));
 });
 function steer(x,t){
- if(!active||pending||complete||performance.now()<lockedUntil)return;
+ if(!active||pending||complete||revealNeedsContinue||performance.now()<lockedUntil)return;
  const direction=x<.25?-1:x>.75?1:0;
  if(direction){
    gestureBase=null;
@@ -282,12 +282,42 @@ function witchSay(text){
  if(!motion.matches){void box.offsetWidth;box.classList.add('speaking')}
 }
 function witchGuide(){
- if(complete){witchSay('牌已经全部揭晓。'+$('#reading').textContent+' 最后，'+$('#step').textContent);return}
- if(pending){witchSay('你已选好这一张。准备好了，就翻开它，看看它带来的线索。');return}
- const lastCard=drawn.at(-1);
- const previous=lastCard?'「'+lastCard.name+'」'+(lastCard.reversed?'逆位':'正位')+'，让我们留意'+meaning(lastCard)+'。':'';
- witchSay(previous+(drawn.length?'现在，':'')+'请为「'+positions[drawn.length][0]+'」选一张牌。你可以慢慢浏览，点击侧边的牌让它来到中央，再点击一次抽取。');
+ if(revealNeedsContinue){
+   const i=drawn.length-1,c=drawn[i];
+   witchSay('在「'+positions[i][0]+'」的位置，你翻开了「'+c.name+'」'+(c.reversed?'逆位':'正位')+'。这张牌的线索是'+meaning(c)+'。'+positions[i][2]+' '+c.step);
+   $('#continue-reading').hidden=false;
+   $('#continue-reading').textContent=complete?'听整体解读':'继续抽下一张';
+   $('#actions').hidden=true;$('#navigation').hidden=true;return;
+ }
+ $('#continue-reading').hidden=true;
+ if(complete)return;
+ if(pending){witchSay('这张牌已经来到你面前。准备好了，就翻开它。');return}
+ witchSay((drawn.length?'我们接着看下一张。':'我已为你洗好牌，现在把它们铺开。')+' 请为「'+positions[drawn.length][0]+'」选一张牌。悬停可以细看，点击侧牌移到中央，再点击抽取。');
 }
+
 $('#question').addEventListener('input',()=>{
- if(!active)witchSay($('#question').value.trim()?'我在听。选一个牌阵，准备好后就把这个问题告诉我。':'坐吧，旅人。今晚，你想问什么？');
+ if(!active)witchSay($('#question').value.trim()?'我在听。准备好后，点「告诉她」，我们再一起选牌阵。':'坐吧，旅人。今晚，你想问什么？');
 });
+
+let ritualPhase='question', revealNeedsContinue=false;
+function confirmQuestion(){
+ question=$('#question').value.trim();theme=themes.find(([p])=>p.test(question));
+ ritualPhase='layout';$('#question-step').hidden=true;$('#layout-step').hidden=false;
+ witchSay((question?'我听见了你的问题。'+(theme?'我们一起看看与「'+theme[1]+'」有关的线索。':'我们从牌里的线索慢慢梳理。'):'没有具体问题也没关系，我们看看此刻值得留意的事。')+' 选单张，获得一个启示；或选三张，了解现状、阻碍与建议。');
+ $('#layout').focus();
+}
+function resetQuestion(){
+ ritualPhase='question';revealNeedsContinue=false;active=false;
+ $('#question-step').hidden=false;$('#layout-step').hidden=true;
+ $('#continue-reading').hidden=true;form.hidden=false;table.hidden=true;
+ witchSay('坐吧，旅人。今晚，你想问什么？');$('#question').focus();
+}
+$('#edit-question').onclick=resetQuestion;
+$('#continue-reading').onclick=()=>{
+ revealNeedsContinue=false;$('#continue-reading').hidden=true;
+ if(complete){
+   ritualPhase='finished';result.hidden=false;
+   witchSay('这些牌的线索已经连在一起了。'+$('#reading').textContent+' 愿你带着自己的判断离开这张桌子。今晚的仪式，就到这里。');
+   storeReading();$('#result-title').focus({preventScroll:true});
+ }else{render();action.focus()}
+};

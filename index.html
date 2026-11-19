@@ -15,18 +15,18 @@
 <h1>月相塔罗</h1><p class="intro">从 78 张牌里，为此刻的问题找一个新角度。</p>
 <p class="hint" id="hint" aria-live="polite">可用鼠标、键盘或触屏，也可开启摄像头用手势选牌。</p>
 <form id="setup" class="panel">
- <div class="tag">01 / 起念</div><label for="question">你想问什么？ <small>选填</small></label>
+ <div id="question-step"><div class="tag">起念</div><label for="question">你想问什么？ <small>选填</small></label>
  <textarea id="question" maxlength="240" rows="3" placeholder="例如：面对这次转岗，我最需要考虑什么？"></textarea>
  <div class="examples"><button type="button" data-question="面对这次转岗，我最需要考虑什么？">工作</button><button type="button" data-question="这段关系中，我需要留意什么？">关系</button><button type="button" data-question="我该如何调整最近的学习节奏？">学习</button></div>
- <label for="layout">选择牌阵</label><select id="layout"><option value="advice">三张 · 现状 / 阻碍 / 建议</option><option value="time">三张 · 过去 / 现在 / 未来</option><option value="one">单张 · 此刻的启示</option></select>
+ <button class="primary" type="submit">告诉她</button></div><div id="layout-step" hidden><label for="layout">选择牌阵</label><select id="layout"><option value="advice">三张 · 现状 / 阻碍 / 建议</option><option value="time">三张 · 过去 / 现在 / 未来</option><option value="one">单张 · 此刻的启示</option></select>
  <label class="check"><input id="reverse" type="checkbox" checked> 启用逆位</label>
- <button class="primary" type="submit">告诉她，并开始洗牌</button><p class="privacy">问题不会上传；勾选下方选项后，解读会保存在此浏览器。</p>
-<label class="check"><input id="keep-reading" type="checkbox" checked> 保存本次解读到历史记录</label></form>
+ <button class="primary" type="submit">确认牌阵，开始洗牌</button><p class="privacy">问题不会上传；勾选下方选项后，解读会保存在此浏览器。</p>
+<label class="check"><input id="keep-reading" type="checkbox" checked> 保存本次解读到历史记录</label><button id="edit-question" type="button">修改问题</button></div></form>
 <section id="table" hidden aria-label="塔罗牌桌">
  <div class="status" id="progress" tabindex="-1" aria-live="polite"></div><div id="deck" aria-label="可抽取的塔罗牌"></div>
  <div id="navigation" class="navigation"><button id="prev" aria-label="上一张">←</button><div><label for="browse" id="counter"></label><input type="range" id="browse" min="1" max="78" value="1" aria-label="浏览整副牌"></div><button id="next" aria-label="下一张">→</button></div>
  <div class="controls" id="actions"><button id="action" class="primary">抽取这张牌</button></div>
- <section id="spread" aria-label="已翻开的牌"></section>
+ <div class="controls"><button id="continue-reading" type="button" class="primary" hidden>继续</button></div><section id="spread" aria-label="已翻开的牌"></section>
  <section id="result" class="panel reading" hidden><div class="tag">03 / 解读</div><h2 id="result-title" tabindex="-1">你的牌阵解读</h2><p id="asked"></p><p id="reading"></p><strong>可以试试</strong><p id="step"></p><p id="save-note" role="status"></p></section>
  <div class="controls end"><button id="again">返回提问</button><button id="reset">↻ 重新洗牌</button></div>
 </section></main>

@@ -31,7 +31,7 @@ form.addEventListener('submit',e=>{
  theme=themes.find(([pattern])=>pattern.test(question)); shuffle();
 });
 document.querySelectorAll('[data-question]').forEach(b=>b.onclick=()=>{$('#question').value=b.dataset.question;$('#question').focus()});
-$('#again').onclick=()=>{active=false; form.hidden=false; table.hidden=true; $('#question').focus()};
+$('#again').onclick=()=>{active=false; form.hidden=false; table.hidden=true; witchSay('坐吧，旅人。我们可以从一个新的问题开始。'); $('#question').focus()};
 $('#reset').onclick=shuffle;
 function face(c){
  const names=['major','Wands','Cups','Swords','Pents'];
@@ -117,6 +117,7 @@ function render(){
    $('#reading').textContent=summary+' '+relation+' '+(theme?theme[2]:question?'把你问题中最不确定的一点，与这些线索对照，看看哪一点最贴近实际。':'留意哪个线索最贴近你此刻的处境。');
    $('#step').textContent=drawn.at(-1).step;
  }
+ witchGuide();
 }
 function flyCard(from,to,card){
  if(motion.matches||!from||!to||!to.width)return;
@@ -273,3 +274,20 @@ function paintJournal(){
  }
 }
 $('#history').onclick=()=>{$('#journal-status').textContent='';paintJournal();journal.showModal()};
+
+
+function witchSay(text){
+ const line=$('#witch-line');line.textContent=text;
+ const box=$('#witch-dialogue');box.classList.remove('speaking');
+ if(!motion.matches){void box.offsetWidth;box.classList.add('speaking')}
+}
+function witchGuide(){
+ if(complete){witchSay('牌已经全部揭晓。'+$('#reading').textContent+' 最后，'+$('#step').textContent);return}
+ if(pending){witchSay('你已选好这一张。准备好了，就翻开它，看看它带来的线索。');return}
+ const lastCard=drawn.at(-1);
+ const previous=lastCard?'「'+lastCard.name+'」'+(lastCard.reversed?'逆位':'正位')+'，让我们留意'+meaning(lastCard)+'。':'';
+ witchSay(previous+(drawn.length?'现在，':'')+'请为「'+positions[drawn.length][0]+'」选一张牌。你可以慢慢浏览，点击侧边的牌让它来到中央，再点击一次抽取。');
+}
+$('#question').addEventListener('input',()=>{
+ if(!active)witchSay($('#question').value.trim()?'我在听。选一个牌阵，准备好后就把这个问题告诉我。':'坐吧，旅人。今晚，你想问什么？');
+});

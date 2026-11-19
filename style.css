@@ -62,3 +62,20 @@ main .panel{border-color:#dab37982;box-shadow:0 0 0 1px #b8805824 inset,0 16px 5
 
 .header-tools,.journal-heading{display:flex;align-items:center;gap:8px}.journal-heading{justify-content:space-between}.journal-heading h2{margin:0;color:var(--gold)}#journal{width:min(92vw,640px);max-height:85vh;overflow:auto;color:#f9edd9;background:linear-gradient(150deg,#2c1d38,#170f22);border:1px solid #cda96b99;border-radius:14px;padding:clamp(16px,4vw,30px)}#journal::backdrop{background:#0d0714b8}#journal-list details{border-bottom:1px solid #d9b3754a;padding:12px 0;overflow-wrap:anywhere}#journal-list summary{cursor:pointer;color:#f8ddab;line-height:1.55}#journal-list p,#journal-list li{line-height:1.6}#save-note,#journal-status{color:var(--muted);font-size:13px}.arrival-mode #camera{display:none}
 
+
+.witch-stage{position:relative;width:100%;height:clamp(245px,35vw,480px);overflow:hidden;isolation:isolate;background:#1c1026}
+.witch-stage img{display:block;width:100%;height:auto;min-height:100%;object-fit:cover;object-position:center top;animation:witch-breathe 7s ease-in-out infinite;transform-origin:50% 44%}
+.witch-stage:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 65%,#1d1026);pointer-events:none}
+.witch-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 16% 78%,#ffd69324,transparent 38%),radial-gradient(ellipse at 86% 70%,#d69c641c,transparent 35%);animation:candle-pulse 3.7s ease-in-out infinite;pointer-events:none}
+@keyframes witch-breathe{50%{transform:scale(1.008) translateY(1px)}}@keyframes candle-pulse{50%{opacity:.45}}
+main{padding:0 12px 28px;background:radial-gradient(ellipse at 50% 0%,#4a235750,transparent 65%)}
+.witch-dialogue{position:relative;max-width:660px;margin:-22px auto 16px;padding:18px 22px;background:linear-gradient(145deg,#311c36f5,#190e24f5);border:1px solid #d2a65a;border-radius:10px;z-index:2;text-align:center;box-shadow:0 8px 25px #0c06196b}
+.witch-dialogue strong{font-family:SimSun,serif;font-size:16px;color:var(--gold)}.witch-dialogue p{margin:10px 0 0;font-size:17px;line-height:1.6;color:#f8e5c6}
+.witch-dialogue.speaking{animation:dialogue-glow .8s ease}
+@keyframes dialogue-glow{50%{box-shadow:0 0 28px #dfb16a59}}
+#setup{margin-top:10px}main>.orbit,main>.eyebrow,main>h1,main>.intro{display:none}
+#hint{font-size:14px;max-width:700px}#setup label,#progress{font-size:14px}#setup textarea{font-size:16px}
+body:not(.arrival-mode){background:#1d1026}
+@media(max-width:600px){.witch-stage{height:280px}.witch-stage img{height:100%;width:100%;object-fit:cover;object-position:50% 18%}.witch-dialogue{margin-top:-12px;padding:14px}.witch-dialogue p{font-size:16px}header{padding:14px 12px}header small{display:none}}
+@media(prefers-reduced-motion:reduce){.witch-stage img,.witch-glow,.witch-dialogue.speaking{animation:none}}
+

@@ -9,6 +9,8 @@
  <button id="enter" type="button">开启仪式 <span aria-hidden="true">✧</span></button></div>
 </section>
 <main hidden>
+<section class="witch-stage" aria-label="女巫瑟琳坐在你对面"><img src="witch-room.png" alt="身穿紫金长袍的女巫在烛光与月色中微笑，邀请你入座" fetchpriority="high"><div class="witch-glow" aria-hidden="true"></div></section>
+<section id="witch-dialogue" class="witch-dialogue" aria-label="女巫的对白"><strong>女巫 · 瑟琳</strong><p id="witch-line" role="status" aria-live="polite">坐吧，旅人。今晚，你想问什么？</p></section>
 <div class="orbit" aria-hidden="true"></div><div class="eyebrow">✦ &nbsp; THE LUNAR ORACLE &nbsp; ✦</div>
 <h1>月相塔罗</h1><p class="intro">从 78 张牌里，为此刻的问题找一个新角度。</p>
 <p class="hint" id="hint" aria-live="polite">可用鼠标、键盘或触屏，也可开启摄像头用手势选牌。</p>
@@ -18,7 +20,7 @@
  <div class="examples"><button type="button" data-question="面对这次转岗，我最需要考虑什么？">工作</button><button type="button" data-question="这段关系中，我需要留意什么？">关系</button><button type="button" data-question="我该如何调整最近的学习节奏？">学习</button></div>
  <label for="layout">选择牌阵</label><select id="layout"><option value="advice">三张 · 现状 / 阻碍 / 建议</option><option value="time">三张 · 过去 / 现在 / 未来</option><option value="one">单张 · 此刻的启示</option></select>
  <label class="check"><input id="reverse" type="checkbox" checked> 启用逆位</label>
- <button class="primary" type="submit">✧ 洗牌并开始</button><p class="privacy">问题不会上传；勾选下方选项后，解读会保存在此浏览器。</p>
+ <button class="primary" type="submit">告诉她，并开始洗牌</button><p class="privacy">问题不会上传；勾选下方选项后，解读会保存在此浏览器。</p>
 <label class="check"><input id="keep-reading" type="checkbox" checked> 保存本次解读到历史记录</label></form>
 <section id="table" hidden aria-label="塔罗牌桌">
  <div class="status" id="progress" tabindex="-1" aria-live="polite"></div><div id="deck" aria-label="可抽取的塔罗牌"></div>
